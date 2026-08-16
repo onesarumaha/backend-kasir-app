@@ -14,9 +14,25 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+   public function index(Request $request)
     {
+        $request->validate([
+            'category_id' => [
+                'nullable',
+                'string',
+                'exists:categories,name',
+            ],
+        ]);
+
         $products = Product::with('category')
+            ->when(
+                $request->category_id,
+                function ($query, $categoryName) {
+                    $query->whereHas('category', function ($query) use ($categoryName) {
+                        $query->where('name', $categoryName);
+                    });
+                }
+            )
             ->latest()
             ->get();
 
@@ -24,7 +40,6 @@ class ProductController extends Controller
             'success' => true,
             'message' => 'Data produk berhasil diambil.',
             'data' => ProductResource::collection($products),
-
         ]);
     }
 
