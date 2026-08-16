@@ -28,6 +28,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Sale / Transaksi
     Route::apiResource('sales', SaleController::class);
+    Route::get('sales/{sale}/receipt',[SaleController::class, 'receipt']);
 
     // Stock Movement
     Route::apiResource('stock-movements', StockMovementController::class);

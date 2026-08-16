@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SaleRequest;
+use App\Http\Resources\SaleReceiptResource;
 use App\Http\Resources\SaleResource;
 use App\Models\Product;
 use App\Models\Sale;
@@ -112,18 +113,17 @@ class SaleController extends Controller
         ]);
     }
 
-    private function generateInvoiceNumber(): string
+    public function receipt(Sale $sale)
     {
-        do {
-            $invoice = 'INV-' .
-                now()->format('YmdHis') .
-                '-' .
-                strtoupper(Str::random(4));
+        $sale->load([
+            'user',
+            'items.product',
+        ]);
 
-        } while (
-            Sale::where('invoice_number', $invoice)->exists()
-        );
-
-        return $invoice;
+        return response()->json([
+            'success' => true,
+            'message' => 'Data struk berhasil diambil.',
+            'data' => new SaleReceiptResource($sale),
+        ]);
     }
 }
