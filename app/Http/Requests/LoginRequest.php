@@ -39,9 +39,9 @@ class LoginRequest extends FormRequest
     {
         return [
             'email.required' => 'Email wajib diisi.',
-            'email.email' => 'Format email tidak valid.',
+            'email.email' => 'Format email tidak valid ya.',
 
-            'password.required' => 'Password wajib diisi.',
+            'password.required' => 'Password wajib diisi yaa.',
         ];
     }
 }
