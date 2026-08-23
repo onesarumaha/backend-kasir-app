@@ -14,7 +14,7 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-   public function index(Request $request)
+    public function index(Request $request)
     {
         $request->validate([
             'category_id' => [
@@ -23,6 +23,9 @@ class ProductController extends Controller
                 'exists:categories,name',
             ],
         ]);
+
+        // Tentukan berapa produk per halaman (misal: 8 atau 12)
+        $perPage = $request->get('per_page', 12); 
 
         $products = Product::with('category')
             ->when(
@@ -34,12 +37,11 @@ class ProductController extends Controller
                 }
             )
             ->latest()
-            ->get();
+            ->paginate($perPage); // <-- UBAH ->get() MENJADI ->paginate()
 
-        return response()->json([
+        return ProductResource::collection($products)->additional([
             'success' => true,
             'message' => 'Data produk berhasil diambil.',
-            'data' => ProductResource::collection($products),
         ]);
     }
 
@@ -48,30 +50,16 @@ class ProductController extends Controller
      */
     public function store(StoreProductRequest $request)
     {
-        $product = Product::create([
-            'category_id' => $request->category_id,
-            'code' => $request->code,
-            'barcode' => $request->barcode,
-            'name' => $request->name,
-            'purchase_price' => $request->purchase_price,
-            'selling_price' => $request->selling_price,
-            'stock' => $request->input('stock', 0),
-            'minimum_stock' => $request->input('minimum_stock', 0),
-            'unit' => $request->input('unit', 'pcs'),
-            'image' => $request->image,
-            'status' => $request->input('status', true),
-            'created_by' => $request->user()->id,
-        ]);
-
+        // Cukup panggil method getValidatedData() dari Request
+        $product = Product::create($request->getValidatedData());
         $product->load('category');
 
         return response()->json([
             'success' => true,
             'message' => 'Produk berhasil ditambahkan.',
-            'data' => new ProductResource($product),
+            'data'    => new ProductResource($product),
         ], 201);
     }
-
     /**
      * Display the specified resource.
      */
@@ -91,35 +79,15 @@ class ProductController extends Controller
      */
     public function update(UpdateProductRequest $request, Product $product)
     {
-        $product->update([
-            'category_id' => $request->category_id,
-            'code' => $request->code,
-            'barcode' => $request->barcode,
-            'name' => $request->name,
-            'purchase_price' => $request->purchase_price,
-            'selling_price' => $request->selling_price,
-            'minimum_stock' => $request->input(
-                'minimum_stock',
-                $product->minimum_stock
-            ),
-            'unit' => $request->input(
-                'unit',
-                $product->unit
-            ),
-            'image' => $request->image,
-            'status' => $request->input(
-                'status',
-                $product->status
-            ),
-            'updated_by' => $request->user()->id,
-        ]);
+        // Update data produk menggunakan data dari Request
+        $product->update($request->getValidatedData($product));
 
-        $product->fresh()->load('category');
+        $product->load('category');
 
         return response()->json([
             'success' => true,
             'message' => 'Produk berhasil diperbarui.',
-            'data' => new ProductResource($product),
+            'data'    => new ProductResource($product),
         ]);
     }
 

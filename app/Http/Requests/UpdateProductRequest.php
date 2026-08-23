@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Product;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class UpdateProductRequest extends FormRequest
@@ -127,5 +129,32 @@ class UpdateProductRequest extends FormRequest
 
             'status.boolean' => 'Status harus berupa true atau false.',
         ];
+    }
+
+    public function getValidatedData(Product $product): array
+    {
+        $validated = $this->validated();
+
+        // 1. Cek jika ada file gambar baru dikirim
+        if ($this->hasFile('image')) {
+            // Hapus gambar lama jika ada di storage
+            if ($product->image && Storage::disk('public')->exists($product->image)) {
+                Storage::disk('public')->delete($product->image);
+            }
+
+            // Simpan gambar baru
+            $validated['image'] = $this->file('image')->store('products', 'public');
+        } else {
+            // Jika tidak ada gambar baru, pertahankan gambar lama
+            unset($validated['image']);
+        }
+
+        // 2. Set default values & audit log
+        $validated['minimum_stock'] = $this->input('minimum_stock', $product->minimum_stock);
+        $validated['unit']          = $this->input('unit', $product->unit);
+        $validated['status']        = $this->input('status', $product->status);
+        $validated['updated_by']    = $this->user()->id;
+
+        return $validated;
     }
 }

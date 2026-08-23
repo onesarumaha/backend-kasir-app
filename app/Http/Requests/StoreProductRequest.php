@@ -116,4 +116,23 @@ class StoreProductRequest extends FormRequest
             'status.boolean' => 'Status harus berupa true atau false.',
         ];
     }
+
+    public function getValidatedData(): array
+    {
+        $validated = $this->validated();
+
+        if ($this->hasFile('image')) {
+            $validated['image'] = $this->file('image')->store('products', 'public');
+        } else {
+            $validated['image'] = null;
+        }
+
+        $validated['stock']         = $this->input('stock', 0);
+        $validated['minimum_stock'] = $this->input('minimum_stock', 0);
+        $validated['unit']          = $this->input('unit', 'pcs');
+        $validated['status']        = $this->input('status', true);
+        $validated['created_by']    = $this->user()->id;
+
+        return $validated;
+    }
 }
