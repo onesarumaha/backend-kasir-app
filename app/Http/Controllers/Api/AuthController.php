@@ -7,28 +7,42 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
-
+use Illuminate\Support\Str;
+use App\Models\Tenant;
 class AuthController extends Controller
 {
     public function register(RegisterRequest $request)
     {
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+        $result = DB::transaction(function () use ($request) {
+            $tenant = Tenant::create([
+                'name'      => $request->store_name,
+                'slug'      => Str::slug($request->store_name) . '-' . Str::random(5),
+                'is_active' => true,
+            ]);
 
-        $token = $user->createToken('kasir-token')->plainTextToken;
+            $user = User::create([
+                'tenant_id' => $tenant->id,
+                'name'      => $request->name,
+                'email'     => $request->email,
+                'password'  => Hash::make($request->password),
+                'role'      => 'admin',
+            ]);
+
+            $token = $user->createToken('kasir-token')->plainTextToken;
+
+            return [
+                'user'  => $user->load('tenant'),
+                'token' => $token,
+            ];
+        });
 
         return response()->json([
             'success' => true,
             'message' => 'Registrasi berhasil',
-            'data' => [
-                'user' => $user,
-                'token' => $token,
-            ],
+            'data'    => $result,
         ], 201);
     }
 

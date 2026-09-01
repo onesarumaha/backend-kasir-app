@@ -13,6 +13,7 @@ class Product extends Model
     use HasFactory, SoftDeletes;
 
      protected $fillable = [
+        'tenant_id',
         'category_id',
         'code',
         'barcode',
@@ -77,5 +78,10 @@ class Product extends Model
     public function saleItems(): HasMany
     {
         return $this->hasMany(SaleItem::class);
+    }
+    
+    public function tenant(): BelongsTo
+    {
+        return $this->belongsTo(Tenant::class);
     }
 }

@@ -12,6 +12,7 @@ class Category extends Model
     use HasFactory;
 
     protected $fillable = [
+        'tenant_id',
         'name',
         'description',
         'status',
@@ -48,5 +49,10 @@ class Category extends Model
     public function updater(): BelongsTo
     {
         return $this->belongsTo(User::class, 'updated_by');
+    }
+
+    public function tenant(): BelongsTo
+    {
+        return $this->belongsTo(Tenant::class);
     }
 }

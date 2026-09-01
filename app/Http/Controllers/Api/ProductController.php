@@ -24,7 +24,6 @@ class ProductController extends Controller
             ],
         ]);
 
-        // Tentukan berapa produk per halaman (misal: 8 atau 12)
         $perPage = $request->get('per_page', 12); 
 
         $products = Product::with('category')
@@ -37,7 +36,7 @@ class ProductController extends Controller
                 }
             )
             ->latest()
-            ->paginate($perPage); // <-- UBAH ->get() MENJADI ->paginate()
+            ->paginate($perPage); 
 
         return ProductResource::collection($products)->additional([
             'success' => true,

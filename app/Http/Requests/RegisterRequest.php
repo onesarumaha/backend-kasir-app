@@ -23,6 +23,11 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'store_name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
             'name' => [
                 'required',
                 'string',
@@ -48,6 +53,9 @@ class RegisterRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'store_name.required' => 'Nama toko wajib diisi.',
+            'store_name.max'      => 'Nama toko maksimal 255 karakter.',
+            
             'name.required' => 'Nama wajib diisi.',
             'name.max' => 'Nama maksimal 255 karakter.',
 

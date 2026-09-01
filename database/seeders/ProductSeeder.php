@@ -29,6 +29,8 @@ class ProductSeeder extends Seeder
             'unit' => 'botol',
             'image' => null,
             'status' => true,
+            'tenant_id' => 1,
+            
         ],
         [
             'category' => 'Minuman',
@@ -42,6 +44,7 @@ class ProductSeeder extends Seeder
             'unit' => 'botol',
             'image' => null,
             'status' => true,
+            'tenant_id' => 1,
         ],
         [
             'category' => 'Minuman',
@@ -55,6 +58,7 @@ class ProductSeeder extends Seeder
             'unit' => 'botol',
             'image' => null,
             'status' => true,
+            'tenant_id' => 1,
         ],
         [
             'category' => 'Minuman',
@@ -68,6 +72,7 @@ class ProductSeeder extends Seeder
             'unit' => 'gelas',
             'image' => null,
             'status' => true,
+            'tenant_id' => 1,
         ],
         [
             'category' => 'Minuman',
@@ -81,6 +86,7 @@ class ProductSeeder extends Seeder
             'unit' => 'gelas',
             'image' => null,
             'status' => true,
+            'tenant_id' => 1,
         ],
         [
             'category' => 'Minuman',
@@ -94,6 +100,7 @@ class ProductSeeder extends Seeder
             'unit' => 'gelas',
             'image' => null,
             'status' => true,
+            'tenant_id' => 1,
         ],
         [
             'category' => 'Minuman',
@@ -107,6 +114,7 @@ class ProductSeeder extends Seeder
             'unit' => 'botol',
             'image' => null,
             'status' => true,
+            'tenant_id' => 1,
         ],
         [
             'category' => 'Minuman',
@@ -120,6 +128,7 @@ class ProductSeeder extends Seeder
             'unit' => 'gelas',
             'image' => null,
             'status' => true,
+            'tenant_id' => 1,
         ],
         [
             'category' => 'Minuman',
@@ -133,6 +142,7 @@ class ProductSeeder extends Seeder
             'unit' => 'gelas',
             'image' => null,
             'status' => true,
+            'tenant_id' => 1,
         ],
         [
             'category' => 'Minuman',
@@ -146,6 +156,7 @@ class ProductSeeder extends Seeder
             'unit' => 'botol',
             'image' => null,
             'status' => true,
+            'tenant_id' => 1,
         ],
 
         [
@@ -160,6 +171,7 @@ class ProductSeeder extends Seeder
             'unit' => 'pcs',
             'image' => null,
             'status' => true,
+            'tenant_id' => 1,
         ],
         [
             'category' => 'Makanan',
@@ -173,6 +185,7 @@ class ProductSeeder extends Seeder
             'unit' => 'pcs',
             'image' => null,
             'status' => true,
+            'tenant_id' => 1,
         ],
         [
             'category' => 'Makanan',
@@ -186,6 +199,7 @@ class ProductSeeder extends Seeder
             'unit' => 'porsi',
             'image' => null,
             'status' => true,
+            'tenant_id' => 1,
         ],
         [
             'category' => 'Makanan',
@@ -199,6 +213,7 @@ class ProductSeeder extends Seeder
             'unit' => 'porsi',
             'image' => null,
             'status' => true,
+            'tenant_id' => 1,
         ],
         [
             'category' => 'Makanan',
@@ -212,6 +227,7 @@ class ProductSeeder extends Seeder
             'unit' => 'pcs',
             'image' => null,
             'status' => true,
+            'tenant_id' => 1,
         ],
         [
             'category' => 'Makanan',
@@ -225,6 +241,7 @@ class ProductSeeder extends Seeder
             'unit' => 'porsi',
             'image' => null,
             'status' => true,
+            'tenant_id' => 1,
         ],
         [
             'category' => 'Makanan',
@@ -238,6 +255,7 @@ class ProductSeeder extends Seeder
             'unit' => 'pcs',
             'image' => null,
             'status' => true,
+            'tenant_id' => 1,
         ],
         [
             'category' => 'Makanan',
@@ -251,6 +269,7 @@ class ProductSeeder extends Seeder
             'unit' => 'pcs',
             'image' => null,
             'status' => true,
+            'tenant_id' => 1,
         ],
         [
             'category' => 'Makanan',
@@ -264,6 +283,7 @@ class ProductSeeder extends Seeder
             'unit' => 'pcs',
             'image' => null,
             'status' => true,
+            'tenant_id' => 1,
         ],
         [
             'category' => 'Makanan',
@@ -277,6 +297,7 @@ class ProductSeeder extends Seeder
             'unit' => 'pcs',
             'image' => null,
             'status' => true,
+            'tenant_id' => 1,
         ],
         [
             'category' => 'Makanan',
@@ -290,6 +311,7 @@ class ProductSeeder extends Seeder
             'unit' => 'pcs',
             'image' => null,
             'status' => true,
+            'tenant_id' => 1,
         ],
         [
             'category' => 'Makanan',
@@ -303,6 +325,7 @@ class ProductSeeder extends Seeder
             'unit' => 'pcs',
             'image' => null,
             'status' => true,
+            'tenant_id' => 1,
         ],
         [
             'category' => 'Makanan',
@@ -316,6 +339,7 @@ class ProductSeeder extends Seeder
             'unit' => 'porsi',
             'image' => null,
             'status' => true,
+            'tenant_id' => 1,
         ],
         [
             'category' => 'Makanan',
@@ -329,6 +353,7 @@ class ProductSeeder extends Seeder
             'unit' => 'porsi',
             'image' => null,
             'status' => true,
+            'tenant_id' => 1,
         ],
         [
             'category' => 'Makanan',
@@ -342,6 +367,7 @@ class ProductSeeder extends Seeder
             'unit' => 'porsi',
             'image' => null,
             'status' => true,
+            'tenant_id' => 1,
         ],
     ];
 
@@ -364,6 +390,7 @@ class ProductSeeder extends Seeder
                 'unit' => $product['unit'],
                 'image' => $product['image'],
                 'status' => $product['status'],
+                'tenant_id' => $product['tenant_id'],
             ]);
         }
     }

@@ -12,6 +12,7 @@ class Sale extends Model
     use HasFactory;
 
      protected $fillable = [
+        'tenant_id',
         'invoice_number',
         'user_id',
         'transaction_date',
@@ -55,6 +56,11 @@ class Sale extends Model
     public function items(): HasMany
     {
         return $this->hasMany(SaleItem::class);
+    }
+
+    public function tenant(): BelongsTo
+    {
+        return $this->belongsTo(Tenant::class);
     }
 
 }
