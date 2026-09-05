@@ -14,8 +14,11 @@ class Tenant extends Model
     protected $fillable = [
         'name',
         'slug',
+        'email',
         'phone',
         'address',
+        'logo',
+        'footer_receipt_text',
         'is_active',
     ];
 

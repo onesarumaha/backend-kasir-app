@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -48,13 +49,8 @@ class AuthController extends Controller
 
     public function login(LoginRequest $request)
     {
+        // Jika sampai di sini, artinya email, password, dan status tenant SUDAH VALID
         $user = User::where('email', $request->email)->first();
-
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['Email atau password salah.'],
-            ]);
-        }
 
         $user->tokens()->delete();
 
@@ -64,7 +60,7 @@ class AuthController extends Controller
             'success' => true,
             'message' => 'Login berhasil',
             'data' => [
-                'user' => $user,
+                'user' => new UserResource($user->load('tenant')),
                 'token' => $token,
             ],
         ]);

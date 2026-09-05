@@ -3,8 +3,10 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\ProfileTenantCOntroler;
 use App\Http\Controllers\Api\SaleController;
 use App\Http\Controllers\Api\StockMovementController;
+use App\Http\Controllers\Api\TenantController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -28,5 +30,19 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('sales/{sale}/receipt',[SaleController::class, 'receipt']);
 
     Route::apiResource('stock-movements', StockMovementController::class);
+
+    Route::prefix('tenant/profile')->group(function () {
+        Route::get('/', [ProfileTenantCOntroler::class, 'show']);
+        Route::post('/', [ProfileTenantCOntroler::class, 'update']); 
+    });
+
+    Route::middleware(['role:superadmin'])->prefix('tenants')->group(function () {
+        Route::get('/', [TenantController::class, 'index']);
+        Route::post('/', [TenantController::class, 'store']);
+        Route::get('/{id}', [TenantController::class, 'show']);
+        Route::post('/{id}', [TenantController::class, 'update']);
+        Route::delete('/{id}', [TenantController::class, 'destroy']);
+        Route::patch('/{id}/toggle-status', [TenantController::class, 'toggleStatus']);
+    });
 
 });
