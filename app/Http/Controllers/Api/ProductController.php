@@ -17,26 +17,39 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $request->validate([
-            'category_id' => [
-                'nullable',
-                'string',
-                'exists:categories,name',
-            ],
+            'category_id' => ['nullable', 'string'],
+            'search'      => ['nullable', 'string'],
+            'per_page'    => ['nullable', 'integer', 'min:1', 'max:100'],
         ]);
 
-        $perPage = $request->get('per_page', 12); 
+        $perPage = $request->get('per_page', 12);
 
         $products = Product::with('category')
-            ->when(
-                $request->category_id,
-                function ($query, $categoryName) {
-                    $query->whereHas('category', function ($query) use ($categoryName) {
-                        $query->where('name', $categoryName);
-                    });
-                }
-            )
+            ->when(auth()->check() && auth()->user()->tenant_id, function ($query) {
+                $query->where('tenant_id', auth()->user()->tenant_id);
+            })
+            ->when($request->filled('category_id') && $request->category_id !== 'ALL', function ($query) use ($request) {
+                $cat = $request->category_id;
+                $query->where(function ($q) use ($cat) {
+                    if (is_numeric($cat)) {
+                        $q->where('category_id', $cat);
+                    } else {
+                        $q->whereHas('category', function ($qName) use ($cat) {
+                            $qName->where('name', $cat);
+                        });
+                    }
+                });
+            })
+            ->when($request->filled('search'), function ($query) use ($request) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('barcode', 'like', "%{$search}%")
+                    ->orWhere('code', 'like', "%{$search}%");
+                });
+            })
             ->latest()
-            ->paginate($perPage); 
+            ->paginate($perPage);
 
         return ProductResource::collection($products)->additional([
             'success' => true,

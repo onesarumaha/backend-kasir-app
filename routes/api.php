@@ -20,17 +20,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
 
-    // Category
     Route::apiResource('categories', CategoryController::class);
 
-    // Product
     Route::apiResource('products', ProductController::class);
 
-    // Sale / Transaksi
     Route::apiResource('sales', SaleController::class);
     Route::get('sales/{sale}/receipt',[SaleController::class, 'receipt']);
 
-    // Stock Movement
     Route::apiResource('stock-movements', StockMovementController::class);
 
 });

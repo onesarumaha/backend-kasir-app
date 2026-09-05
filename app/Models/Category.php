@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Auth;
 
 class Category extends Model
 {
@@ -19,6 +21,23 @@ class Category extends Model
         'created_by',
         'updated_by',
     ];
+
+    protected static function booted()
+    {
+        // Otomatis filter query berdasarkan tenant_id
+        static::addGlobalScope('tenant', function (Builder $builder) {
+            if (Auth::check() && Auth::user()->tenant_id) {
+                $builder->where('tenant_id', Auth::user()->tenant_id);
+            }
+        });
+
+        // Otomatis assign tenant_id saat pembuatan kategori baru
+        static::creating(function ($model) {
+            if (Auth::check() && Auth::user()->tenant_id) {
+                $model->tenant_id = Auth::user()->tenant_id;
+            }
+        });
+    }
 
     protected function casts(): array
     {

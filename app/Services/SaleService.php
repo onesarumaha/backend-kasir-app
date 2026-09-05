@@ -21,21 +21,20 @@ class SaleService
     public function create(array $data, User $user): Sale
     {
         return DB::transaction(function () use ($data, $user) {
+            $tenantId = $user->tenant_id;
 
             /*
-             * Ambil dan lock semua produk terlebih dahulu.
-             *
-             * lockForUpdate() mencegah dua transaksi bersamaan
-             * menggunakan stok yang sama.
-             */
-            $products = $this->getProducts($data['items']);
+            * Ambil dan lock semua produk milik tenant yang sedang login.
+            */
+            $products = $this->getProducts($data['items'], $tenantId);
 
             /*
-             * Hitung semua item transaksi.
-             */
+            * Hitung semua item transaksi.
+            */
             $calculation = $this->calculateItems(
                 $data['items'],
-                $products
+                $products,
+                $tenantId
             );
 
             $subtotal = $calculation['subtotal'];
@@ -43,8 +42,8 @@ class SaleService
             $items = $calculation['items'];
 
             /*
-             * Hitung discount.
-             */
+            * Hitung discount.
+            */
             $discount = (float) ($data['discount'] ?? 0);
 
             if ($discount > $subtotal) {
@@ -56,13 +55,13 @@ class SaleService
             }
 
             /*
-             * Tax.
-             */
+            * Tax.
+            */
             $tax = (float) ($data['tax'] ?? 0);
 
             /*
-             * Grand total.
-             */
+            * Grand total.
+            */
             $grandTotal = $subtotal - $discount + $tax;
 
             if ($grandTotal < 0) {
@@ -74,8 +73,8 @@ class SaleService
             }
 
             /*
-             * Payment.
-             */
+            * Payment.
+            */
             $payment = (float) $data['payment'];
 
             if ($payment < $grandTotal) {
@@ -87,42 +86,42 @@ class SaleService
             }
 
             /*
-             * Kembalian.
-             */
+            * Kembalian.
+            */
             $change = $payment - $grandTotal;
 
             /*
-             * Buat nomor invoice.
-             */
-            $invoiceNumber = $this->generateInvoiceNumber();
+            * Buat nomor invoice per tenant.
+            */
+            $invoiceNumber = $this->generateInvoiceNumber($tenantId);
 
             /*
-             * Buat Sale.
-             */
+            * Buat Sale Header.
+            */
             $sale = Sale::create([
-                'invoice_number' => $invoiceNumber,
-                'user_id' => $user->id,
+                'invoice_number'   => $invoiceNumber,
+                'user_id'          => $user->id,
+                'tenant_id'        => $tenantId,
                 'transaction_date' => now(),
 
-                'total_item' => $totalItem,
+                'total_item'       => $totalItem,
 
-                'subtotal' => $subtotal,
-                'discount' => $discount,
-                'tax' => $tax,
-                'grand_total' => $grandTotal,
+                'subtotal'         => $subtotal,
+                'discount'         => $discount,
+                'tax'              => $tax,
+                'grand_total'      => $grandTotal,
 
-                'payment' => $payment,
-                'change' => $change,
+                'payment'          => $payment,
+                'change'           => $change,
 
-                'payment_method' => $data['payment_method'],
-                'status' => 'completed',
-                'note' => $data['note'] ?? null,
+                'payment_method'   => $data['payment_method'],
+                'status'           => 'completed',
+                'note'             => $data['note'] ?? null,
             ]);
 
             /*
-             * Buat SaleItem, update stock,
-             * dan buat StockMovement.
-             */
+            * Buat SaleItem, update stock, dan buat StockMovement.
+            */
             foreach ($items as $item) {
                 $this->createSaleItemAndUpdateStock(
                     $sale,
@@ -132,8 +131,8 @@ class SaleService
             }
 
             /*
-             * Load relasi agar siap digunakan oleh Resource.
-             */
+            * Load relasi agar siap digunakan oleh Resource.
+            */
             $sale->load([
                 'user',
                 'items.product',
@@ -148,7 +147,7 @@ class SaleService
      *
      * Semua row product di-lock selama transaction berlangsung.
      */
-    private function getProducts(array $items)
+    private function getProducts(array $items, $tenantId)
     {
         $productIds = collect($items)
             ->pluck('product_id')
@@ -156,6 +155,7 @@ class SaleService
             ->values();
 
         return Product::query()
+            ->where('tenant_id', $tenantId)
             ->whereIn('id', $productIds)
             ->lockForUpdate()
             ->get()
@@ -167,7 +167,8 @@ class SaleService
      */
     private function calculateItems(
         array $items,
-        $products
+        $products,
+        $tenantId
     ): array {
         $subtotal = 0;
         $totalItem = 0;
@@ -239,6 +240,14 @@ class SaleService
     ): void {
         $product = $item['product'];
 
+        $tenantId = $sale->tenant_id ?? $user->tenant_id ?? $product->tenant_id;
+
+        if (!$tenantId) {
+            throw ValidationException::withMessages([
+                'tenant_id' => ['User atau Produk tidak terasosiasi dengan tenant manapun.'],
+            ]);
+        }
+
         /*
          * Simpan stok sebelum transaksi.
          */
@@ -273,6 +282,7 @@ class SaleService
          */
         StockMovement::create([
             'product_id' => $product->id,
+            'tenant_id' => $tenantId,
 
             'type' => 'sale',
 
