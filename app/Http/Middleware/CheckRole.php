@@ -17,7 +17,9 @@ class CheckRole
     {
         $user = $request->user();
 
-        if (!$user || !in_array($user->role, $roles)) {
+        $userRole = is_string($user->role) ? $user->role : ($user->role->name ?? '');
+
+        if (!$user || !in_array($userRole, $roles)) {
             return response()->json([
                 'message' => 'Akses ditolak. Anda tidak memiliki hak akses yang sesuai.'
             ], 403);

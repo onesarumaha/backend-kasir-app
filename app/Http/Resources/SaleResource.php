@@ -43,6 +43,14 @@ class SaleResource extends JsonResource
             'items' => SaleItemResource::collection(
                 $this->whenLoaded('items')
             ),
+            'tenant' => $this->whenLoaded('tenant', function () {
+                return [
+                    'id' => $this->tenant->id,
+                    'name' => $this->tenant->name,
+                    'address' => $this->tenant->address,
+                    'logo_url' => $this->tenant->logo_url ?? null,
+                ];
+            }),
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
